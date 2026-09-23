@@ -45,4 +45,14 @@ public class CourierSteps {
                 .then()
                 .statusCode(SC_OK);
     }
+
+    @Step("Удалить курьера по id (без проверки)")
+    public static Response deleteCourierRaw(int id) {
+        return courierClient.deleteCourier(id);
+    }
+
+    @Step("Удалить курьера без указания id")
+    public static Response deleteCourierWithoutId() {
+        return courierClient.deleteCourierWithoutId();
+    }
 }

@@ -30,6 +30,17 @@ public class OrderClient extends BaseClient {
                 .put(ORDER_PATH + "/accept/" + id);
     }
 
+    public Response acceptOrderWithoutCourierId(int id) {
+        return baseRequest()
+                .put(ORDER_PATH + "/accept/" + id);
+    }
+
+    public Response acceptOrderWithoutId(int courierId) {
+        return baseRequest()
+                .queryParam("courierId", courierId)
+                .put(ORDER_PATH + "/accept/");
+    }
+
     public Response cancelOrder(int track) {
         return baseRequest()
                 .put(ORDER_PATH + "/cancel?track=" + track);

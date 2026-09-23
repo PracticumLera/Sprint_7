@@ -24,4 +24,9 @@ public class CourierClient extends BaseClient {
         return baseRequest()
                 .delete(COURIER_PATH + "/" + id);
     }
+
+    public Response deleteCourierWithoutId() {
+        return baseRequest()
+                .delete(COURIER_PATH + "/");
+    }
 }

@@ -24,6 +24,13 @@ public class OrderSteps {
         return response;
     }
 
+    @Step("Создать заказ и получить id")
+    public static int createOrderAndGetId(Order order) {
+        Response createResponse = createOrderAndCheck(order);
+        int track = createResponse.then().extract().path("track");
+        return getOrderByTrack(track).then().extract().path("order.id");
+    }
+
     @Step("Получить список заказов")
     public static Response getOrders() {
         return orderClient.getOrders();
@@ -34,9 +41,26 @@ public class OrderSteps {
         return orderClient.getOrderByTrack(track);
     }
 
+    @Step("Получить заказ по треку и проверить")
+    public static Response getOrderByTrackAndCheck(int track) {
+        Response response = orderClient.getOrderByTrack(track);
+        response.then().statusCode(SC_OK).body("order", notNullValue());
+        return response;
+    }
+
     @Step("Принять заказ")
     public static Response acceptOrder(int id, int courierId) {
         return orderClient.acceptOrder(id, courierId);
+    }
+
+    @Step("Принять заказ без указания id курьера")
+    public static Response acceptOrderWithoutCourierId(int id) {
+        return orderClient.acceptOrderWithoutCourierId(id);
+    }
+
+    @Step("Принять заказ без указания id заказа")
+    public static Response acceptOrderWithoutId(int courierId) {
+        return orderClient.acceptOrderWithoutId(courierId);
     }
 
     @Step("Отменить заказ по треку")
