@@ -2,30 +2,27 @@ package data;
 
 import model.Courier;
 
+import java.util.Random;
+import java.util.UUID;
+
 public class CourierData {
 
-    private static final String LOGIN = "login_";
-    private static final String PASSWORD = "pass_";
-    private static final String COURIER_NAME = "courierName_";
+    private static final Random RANDOM = new Random();
 
     private static String generateLogin() {
-        return LOGIN + System.currentTimeMillis();
+        return "courier_" + UUID.randomUUID().toString().substring(0, 8);
     }
 
     private static String generatePassword() {
-        return PASSWORD + System.currentTimeMillis();
+        return "pass_" + UUID.randomUUID().toString().substring(0, 6);
     }
 
     private static String generateFirstName() {
-        return COURIER_NAME + System.currentTimeMillis();
+        return "Name_" + RANDOM.nextInt(1000);
     }
 
     public static Courier getRandomCourier() {
         return new Courier(generateLogin(), generatePassword(), generateFirstName());
-    }
-
-    public static Courier getCourierWithLogin(String login) {
-        return new Courier(login, generatePassword(), generateFirstName());
     }
 
     public static Courier getCourierWithoutLogin() {

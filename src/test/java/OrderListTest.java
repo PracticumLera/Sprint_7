@@ -4,6 +4,7 @@ import io.restassured.response.Response;
 import org.junit.Test;
 import steps.OrderSteps;
 
+import static org.apache.http.HttpStatus.*;
 import static org.hamcrest.Matchers.notNullValue;
 
 public class OrderListTest extends BaseApiTest {
@@ -13,6 +14,6 @@ public class OrderListTest extends BaseApiTest {
     @Description("Проверка, что в тело ответа возвращается список заказов")
     public void getOrdersList() {
         Response response = OrderSteps.getOrders();
-        response.then().statusCode(200).body("orders", notNullValue());
+        response.then().statusCode(SC_OK).body("orders", notNullValue());
     }
 }

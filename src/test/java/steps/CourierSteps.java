@@ -6,6 +6,7 @@ import io.restassured.response.Response;
 import model.Courier;
 import model.CourierCredentials;
 
+import static org.apache.http.HttpStatus.*;
 import static org.hamcrest.Matchers.equalTo;
 
 public class CourierSteps {
@@ -20,15 +21,20 @@ public class CourierSteps {
     @Step("Создать курьера и проверить, что он создан")
     public static Response createCourierAndCheck(Courier courier) {
         Response response = courierClient.createCourier(courier);
-        response.then().statusCode(201).body("ok", equalTo(true));
+        response.then().statusCode(SC_CREATED).body("ok", equalTo(true));
         return response;
+    }
+
+    @Step("Логин курьера")
+    public static Response loginCourier(CourierCredentials credentials) {
+        return courierClient.loginCourier(credentials);
     }
 
     @Step("Залогинить курьера и получить id")
     public static int loginCourierAndGetId(CourierCredentials credentials) {
         return courierClient.loginCourier(credentials)
                 .then()
-                .statusCode(200)
+                .statusCode(SC_OK)
                 .extract()
                 .path("id");
     }
@@ -37,11 +43,6 @@ public class CourierSteps {
     public static void deleteCourier(int id) {
         courierClient.deleteCourier(id)
                 .then()
-                .statusCode(200);
-    }
-
-    @Step("Логин курьера")
-    public static Response loginCourier(CourierCredentials credentials) {
-        return courierClient.loginCourier(credentials);
+                .statusCode(SC_OK);
     }
 }

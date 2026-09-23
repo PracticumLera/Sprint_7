@@ -5,6 +5,7 @@ import io.qameta.allure.Step;
 import io.restassured.response.Response;
 import model.Order;
 
+import static org.apache.http.HttpStatus.*;
 import static org.hamcrest.Matchers.notNullValue;
 
 public class OrderSteps {
@@ -19,7 +20,7 @@ public class OrderSteps {
     @Step("Создать заказ и проверить, что он создан")
     public static Response createOrderAndCheck(Order order) {
         Response response = orderClient.createOrder(order);
-        response.then().statusCode(201).body("track", notNullValue());
+        response.then().statusCode(SC_CREATED).body("track", notNullValue());
         return response;
     }
 
@@ -36,5 +37,10 @@ public class OrderSteps {
     @Step("Принять заказ")
     public static Response acceptOrder(int id, int courierId) {
         return orderClient.acceptOrder(id, courierId);
+    }
+
+    @Step("Отменить заказ по треку")
+    public static Response cancelOrder(int track) {
+        return orderClient.cancelOrder(track);
     }
 }

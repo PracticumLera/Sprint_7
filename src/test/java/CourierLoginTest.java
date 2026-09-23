@@ -1,6 +1,7 @@
 import data.CourierData;
 import io.qameta.allure.Description;
 import io.qameta.allure.junit4.DisplayName;
+import io.restassured.response.Response;
 import model.Courier;
 import model.CourierCredentials;
 import org.junit.After;
@@ -8,12 +9,13 @@ import org.junit.Before;
 import org.junit.Test;
 import steps.CourierSteps;
 
+import static org.apache.http.HttpStatus.*;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.notNullValue;
 
 public class CourierLoginTest extends BaseApiTest {
 
     private Courier courier;
-    private int courierId;
 
     @Before
     public void setUp() {
@@ -23,8 +25,15 @@ public class CourierLoginTest extends BaseApiTest {
 
     @After
     public void tearDown() {
-        if (courierId != 0) {
-            CourierSteps.deleteCourier(courierId);
+        Response loginResponse = CourierSteps.loginCourier(
+                new CourierCredentials(courier.getLogin(), courier.getPassword())
+        );
+
+        if (loginResponse.statusCode() == SC_OK) {
+            Integer courierId = loginResponse.then().extract().path("id");
+            if (courierId != null && courierId > 0) {
+                CourierSteps.deleteCourier(courierId);
+            }
         }
     }
 
@@ -33,7 +42,10 @@ public class CourierLoginTest extends BaseApiTest {
     @Description("Курьер может авторизоваться, возвращается id")
     public void loginCourierSuccess() {
         CourierCredentials creds = new CourierCredentials(courier.getLogin(), courier.getPassword());
-        courierId = CourierSteps.loginCourierAndGetId(creds);
+        CourierSteps.loginCourier(creds)
+                .then()
+                .statusCode(SC_OK)
+                .body("id", notNullValue());
     }
 
     @Test
@@ -43,7 +55,7 @@ public class CourierLoginTest extends BaseApiTest {
         CourierCredentials creds = new CourierCredentials(courier.getLogin(), null);
         CourierSteps.loginCourier(creds)
                 .then()
-                .statusCode(400)
+                .statusCode(SC_BAD_REQUEST)
                 .body("message", equalTo("Недостаточно данных для входа"));
     }
 
@@ -54,7 +66,7 @@ public class CourierLoginTest extends BaseApiTest {
         CourierCredentials creds = new CourierCredentials(null, courier.getPassword());
         CourierSteps.loginCourier(creds)
                 .then()
-                .statusCode(400)
+                .statusCode(SC_BAD_REQUEST)
                 .body("message", equalTo("Недостаточно данных для входа"));
     }
 
@@ -65,7 +77,7 @@ public class CourierLoginTest extends BaseApiTest {
         CourierCredentials creds = new CourierCredentials("wrong_" + courier.getLogin(), courier.getPassword());
         CourierSteps.loginCourier(creds)
                 .then()
-                .statusCode(404)
+                .statusCode(SC_NOT_FOUND)
                 .body("message", equalTo("Учетная запись не найдена"));
     }
 
@@ -76,7 +88,7 @@ public class CourierLoginTest extends BaseApiTest {
         CourierCredentials creds = new CourierCredentials(courier.getLogin(), "wrong_" + courier.getPassword());
         CourierSteps.loginCourier(creds)
                 .then()
-                .statusCode(404)
+                .statusCode(SC_NOT_FOUND)
                 .body("message", equalTo("Учетная запись не найдена"));
     }
 
@@ -87,7 +99,7 @@ public class CourierLoginTest extends BaseApiTest {
         CourierCredentials creds = new CourierCredentials("nonexistent_" + System.currentTimeMillis(), "pass");
         CourierSteps.loginCourier(creds)
                 .then()
-                .statusCode(404)
+                .statusCode(SC_NOT_FOUND)
                 .body("message", equalTo("Учетная запись не найдена"));
     }
 }
