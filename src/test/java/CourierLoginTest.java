@@ -1,10 +1,7 @@
 import data.CourierData;
 import io.qameta.allure.Description;
 import io.qameta.allure.junit4.DisplayName;
-import io.restassured.response.Response;
-import model.Courier;
 import model.CourierCredentials;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import steps.CourierSteps;
@@ -13,28 +10,12 @@ import static org.apache.http.HttpStatus.*;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
 
-public class CourierLoginTest extends BaseApiTest {
-
-    private Courier courier;
+public class CourierLoginTest extends BaseCourierTest {
 
     @Before
     public void setUp() {
         courier = CourierData.getRandomCourier();
         CourierSteps.createCourierAndCheck(courier);
-    }
-
-    @After
-    public void tearDown() {
-        Response loginResponse = CourierSteps.loginCourier(
-                new CourierCredentials(courier.getLogin(), courier.getPassword())
-        );
-
-        if (loginResponse.statusCode() == SC_OK) {
-            Integer courierId = loginResponse.then().extract().path("id");
-            if (courierId != null && courierId > 0) {
-                CourierSteps.deleteCourier(courierId);
-            }
-        }
     }
 
     @Test

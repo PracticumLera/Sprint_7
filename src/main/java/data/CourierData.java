@@ -8,17 +8,20 @@ import java.util.UUID;
 public class CourierData {
 
     private static final Random RANDOM = new Random();
+    private static final int LOGIN_UUID_LENGTH = 8;
+    private static final int PASSWORD_UUID_LENGTH = 6;
+    private static final int MAX_NAME_SUFFIX = 1000;
 
     private static String generateLogin() {
-        return "courier_" + UUID.randomUUID().toString().substring(0, 8);
+        return "courier_" + UUID.randomUUID().toString().substring(0, LOGIN_UUID_LENGTH);
     }
 
     private static String generatePassword() {
-        return "pass_" + UUID.randomUUID().toString().substring(0, 6);
+        return "pass_" + UUID.randomUUID().toString().substring(0, PASSWORD_UUID_LENGTH);
     }
 
     private static String generateFirstName() {
-        return "Name_" + RANDOM.nextInt(1000);
+        return "Name_" + RANDOM.nextInt(MAX_NAME_SUFFIX);
     }
 
     public static Courier getRandomCourier() {
@@ -26,10 +29,16 @@ public class CourierData {
     }
 
     public static Courier getCourierWithoutLogin() {
-        return new Courier(null, generatePassword(), generateFirstName());
+        return Courier.builder()
+                .password(generatePassword())
+                .firstName(generateFirstName())
+                .build();
     }
 
     public static Courier getCourierWithoutPassword() {
-        return new Courier(generateLogin(), null, generateFirstName());
+        return Courier.builder()
+                .login(generateLogin())
+                .firstName(generateFirstName())
+                .build();
     }
 }
